@@ -4,7 +4,7 @@ const Utils = require('../helpers/utils');
 
 module.exports = {
     command: "~gStat",
-    name: "~gStat",
+    name: "gStat",
     description: "Get group statistics!",
     usage: "~gStat (Will return stats for whole guild)\n    ~gStat class=Witch (Will return stats for witches)\n    ~gStat <key_word>=<target_value>",
     requiresAdmin: true,

@@ -14,7 +14,7 @@ function execute(args) {
     if(args.message.author.id != "191096759353606155") {
         args.message.reply("sorry, only mushroom-channn can use this <.<");
     } else {
-        let existingTeamRoles = Config.get("nodewar_teams") == undefined ? [] : Config.get("nodewar_teams");
+        let existingTeamRoles = Config.cacheGet(msg.guild.id).guildTeams == null ? [] : Config.cacheGet(msg.guild.id).guildTeams;
         let guildMembers = args.message.guild.members.array();
         guildMembers.forEach(member => {
             Database.findUser(member.id, (user) => {

@@ -2,6 +2,7 @@ const Config = require('./config');
 const MongoClient = require('mongodb').MongoClient;
 var client;
 
+// Wait for config to load before logging into MongoDB (incase mongodb details are in the config)
 Config.onConfigLoad(() => {
   let uri = (process.env.MONGODB_URI != undefined ? process.env.MONGODB_URI : Config.get("mongodb_uri"));
   client = new MongoClient(uri, { useNewUrlParser: true });
@@ -10,6 +11,7 @@ Config.onConfigLoad(() => {
   });
 });
 
+// Find a user based on their discord id
 function findUser(discordId, callback) {
   let gearDb = client.db("gear");
   gearDb.collection("users").findOne({discord_id: discordId}, (err, record) => {
@@ -27,6 +29,7 @@ function findUser(discordId, callback) {
 
 }
 
+// Add a user with default necessary values
 function addUser(ap, aap, dp, gs, level, cls, screenshot_link, guild, discordId, callback) {
   findUser(discordId, (user) => {
     if(user == null) {
@@ -56,6 +59,7 @@ function addUser(ap, aap, dp, gs, level, cls, screenshot_link, guild, discordId,
   });
 }
 
+// Delete a given id from the `users` collection
 function deleteUser(discordId, callback) {
   let gearDb = client.db("gear");
   gearDb.collection("users").deleteOne({discord_id: discordId}, (err, obj) => {
@@ -67,6 +71,7 @@ function deleteUser(discordId, callback) {
   });
 }
 
+// Update a user's basic gear object
 function updateUser(discordId, gearObject, discordMessage, callback) {
   let gearDb = client.db("gear");
   gearDb.collection("users").updateOne({discord_id: discordId}, {$set: gearObject}, (error, record) => {
@@ -78,6 +83,7 @@ function updateUser(discordId, gearObject, discordMessage, callback) {
   })
 }
 
+// Get all users who have the specified guildId attached to their user
 function getWholeGuild(guildId, callback, discordMessage) {
   let gearDb = client.db("gear");
   gearDb.collection("users").find({guild: guildId}, (err, records) => {
@@ -91,6 +97,7 @@ function getWholeGuild(guildId, callback, discordMessage) {
   });
 }
 
+// Get the total number of documents in the `gear.users` collection
 function getTotalNumberOfUsers(callback) {
   let gearDb = client.db("gear");
   gearDb.collection("users").find({}, (err, records) => {
@@ -104,7 +111,8 @@ function getTotalNumberOfUsers(callback) {
   })
 }
 
-function customUpdate(discordId, updateQuery, callback) {
+// Execute a custom update query on a given user id
+function customUpdateUser(discordId, updateQuery, callback) {
   let gearDb = client.db("gear");
   gearDb.collection("users").updateOne({discord_id: discordId}, updateQuery, (error, record) => {
     if(error) {
@@ -115,10 +123,85 @@ function customUpdate(discordId, updateQuery, callback) {
   })
 }
 
+// Find a guild from the `guilds` collection, searching by gid
+function findGuild(guildId, callback) {
+  let gearDb = client.db("gear");
+  gearDb.collection("guilds").findOne({gid: guildId}, (err, record) => {
+    if(err) {
+      callback(err, null);
+    } else {
+      if(record) {
+        Config.cacheSet(guildId, record);
+        callback(null, record);
+      } else {
+        callback(null, null);
+      }
+    }
+  });
+}
+
+// Execute a custom update query on a guild from `guilds` collection with the specified guildId
+function updateGuild(guildId, updateQuery, callback) {
+  let gearDb = client.db("gear");
+  gearDb.collection("guilds").findOneAndUpdate({gid: guildId}, updateQuery, (error, record) => {
+    if(error) {
+      callback(error.message);
+    } else {
+      if(record) {
+        findGuild(guildId, (err, guild) => {
+          if(err) {
+            Config.cacheSet(guildId, {error: "Error setting this guild's cache"});
+          } else {
+            Config.cacheSet(guildId, guild);
+          }
+        });
+      }
+      callback(null);
+    }
+  })
+}
+
+// Delete a guild from the `guilds` collection, searching by gid
+function deleteGuild(guildId, callback) {
+  let gearDb = client.db("gear");
+  gearDb.collection("guilds").deleteOne({gid: guildId}, (err, obj) => {
+    if(err) {
+      callback(err);
+    } else {
+      callback(null);
+    }
+  });
+}
+
+// Add a new guild to the `guilds` collection with default values
+function addGuild(guildId, guildName, callback) {
+  let gearDb = client.db("gear");
+  gearDb.collection("guilds").insertOne({
+    gid: guildId,
+    name: guildName,
+    guildTeams: [],
+    guildManagers: []
+  }, (err, record) => {
+    if(err) {
+      callback(err);
+    } else {
+      callback(null);
+    }
+  });
+}
+
+
+// User Function Exports
 module.exports.getTotalNumberOfUsers = getTotalNumberOfUsers;
 module.exports.addUser = addUser;
 module.exports.findUser = findUser;
 module.exports.deleteUser = deleteUser;
 module.exports.updateUser = updateUser;
 module.exports.getWholeGuild = getWholeGuild;
-module.exports.customUpdate = customUpdate;
+module.exports.customUpdateUser = customUpdateUser;
+
+// Guild Function Exports
+module.exports.updateGuild = updateGuild;
+module.exports.deleteGuild = deleteGuild;
+module.exports.addGuild = addGuild;
+module.exports.findGuild = findGuild;

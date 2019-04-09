@@ -27,13 +27,13 @@ function isManagerMessage(msg) {
     if(msg.member.hasPermission('ADMINISTRATOR') || msg.member.hasPermission('MANAGE_GUILD')) {
         return true;
     } else {
-        let possibleAdminRoles = Config.get("managers");
+        let possibleAdminRoles = Config.cacheGet(msg.guild.id).guildManagers == null ? [] : Config.cacheGet(msg.guild.id).guildManagers
         if(possibleAdminRoles == undefined || possibleAdminRoles == null) {
             return false;
         }
         for (let index = 0; index < possibleAdminRoles.length; index++) {
             const adminRole = possibleAdminRoles[index];
-            if(adminRole.guild == msg.guild.id && msg.member.roles.find(role => role.id = adminRole.id)) {
+            if(msg.member.roles.find(role => role.id = adminRole.id)) {
                 return true;
             }
 

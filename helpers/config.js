@@ -2,6 +2,7 @@ const fs = require('fs');
 
 var isConfigReady = false;
 var config = {};
+var cache = {};
 
 function get(key) {
     if(!isConfigReady) {
@@ -18,6 +19,23 @@ function set(key, value) {
         config[key] = value;
         saveConfig();
     }
+}
+
+function cacheSet(key, value) {
+    cache[key] = value;
+}
+
+function cacheGet(key) {
+    if(cache[key].error) {
+        console.log("There is an error with the " + key + " cache item");
+        return null;
+    } else {
+        return cache[key];
+    }
+}
+
+function getFullCache() {
+    return cache;
 }
 
 function loadConfig() {
@@ -57,3 +75,6 @@ module.exports.loadConfig = loadConfig;
 module.exports.saveConfig = saveConfig;
 module.exports.onConfigLoad = onConfigLoad;
 module.exports.getFullConfig = getFullConfig;
+module.exports.cacheSet = cacheSet;
+module.exports.cacheGet = cacheGet;
+module.exports.getFullCache = getFullCache;

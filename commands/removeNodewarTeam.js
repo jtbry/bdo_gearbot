@@ -1,4 +1,4 @@
-const Config = require('../helpers/config');
+const Database = require('../helpers/database');
 
 module.exports = {
     command: "~removeNodewarTeam",
@@ -11,25 +11,31 @@ module.exports = {
 
 function execute(args) {
     if(!args.message.mentions.roles.first()) {
-        args.message.reply("No role mentions, weirdo.");
         return;
     }
 
-    let existingTeams = Config.get("nodewar_teams") == undefined ? [] : Config.get("nodewar_teams");
-    for (let index = 0; index < existingTeams.length; index++) {
-        const team = existingTeams[index];
-        if(team == null) {
-            existingTeams.splice(index, 1);
-            Config.set("nodewar_teams", existingTeams);
-            args.message.reply("Sorry, I had a smol issue. Please try again");
-            return;
+    Database.findGuild(args.message.guild.id, (err, guild) => {
+        if(err) {
+            args.message.reply("Sorry, I had an issue finding your guild. u_u");
+        } else {
+            if(guild) {
+                let proposedRoleJson = {"id": args.message.mentions.roles.first().id, "name": args.message.mentions.roles.first().name};
+                let existingTeams = guild.guildTeams;
+                if(!existingTeams.find(team => team.id == proposedRoleJson.id)) {
+                    args.message.reply("That role isn't a nodewar team, don't waste my time. :(");
+                } else {
+                    Database.updateGuild(args.message.guild.id, {$pull: {guildTeams: proposedRoleJson}}, (err) => {
+                        if(err) {
+                            console.log(err);
+                            args.message.reply("I had an error removing that role, sorry.");
+                        } else {
+                            args.message.reply("I removed " + proposedRoleJson.name + " from your guild's nodewar teams!");
+                        }
+                    });
+                }
+            } else {
+                args.message.reply("Nani!?!?? Your guild doesn't exist, how did you send this?!");
+            }
         }
-        else if(team.id == args.message.mentions.roles.first().id && team.guild == args.message.guild.id) {
-            existingTeams.splice(index, 1);
-            Config.set("nodewar_teams", existingTeams);
-            args.message.reply("Removed that role from teams!");
-            return;
-        }
-    }
-
+    });
 }

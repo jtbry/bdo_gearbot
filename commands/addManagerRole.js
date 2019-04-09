@@ -1,4 +1,4 @@
-const Config = require('../helpers/config');
+const Database = require('../helpers/database');
 
 module.exports = {
     command: "~addManagerRole",
@@ -10,28 +10,32 @@ module.exports = {
 }
 
 function execute(args) {
-    let configManagers = Config.get("managers");
-    let existingManagers = (configManagers == undefined || configManagers == null) ? [] : configManagers;
+    if(!args.message.mentions.roles.first()) {
+        return;
+    }
 
-    if(existingManagers != []) {
-        for (let index = 0; index < existingManagers.length; index++) {
-            const manager = existingManagers[index];
-            if(manager == null) {
-                existingManagers.splice(index, 1);
-                Config.set("managers", existingManagers);
-                args.message.reply("Sorry, I had a smol issue. Please try again");
-                return;
-            }
-            else if(manager.id == args.message.mentions.roles.first().id && manager.guild == args.message.guild.id) {
-                args.message.reply("That role is already a manager...silly");
-                return;
+    Database.findGuild(args.message.guild.id, (err, guild) => {
+        if(err) {
+            args.message.reply("Sorry, I had an issue finding your guild. u_u");
+        } else {
+            if(guild) {
+                let proposedRoleJson = {"id": args.message.mentions.roles.first().id, "name": args.message.mentions.roles.first().name};
+                let existingManagers = guild.guildManagers;
+                if(existingManagers.find(manager => manager.id == proposedRoleJson.id)) {
+                    args.message.reply("That role is already a manager, don't waste my time. :(");
+                } else {
+                    Database.updateGuild(args.message.guild.id, {$push: {guildManagers: proposedRoleJson}}, (err) => {
+                        if(err) {
+                            console.log(err);
+                            args.message.reply("I had an error adding that role, sorry.");
+                        } else {
+                            args.message.reply("I added " + proposedRoleJson.name + " to your guild managers!");
+                        }
+                    });
+                }
+            } else {
+                args.message.reply("Nani!?!?? Your guild doesn't exist, how did you send this?!");
             }
         }
-    }
-
-    if(args.message.mentions.roles.first()) {
-        existingManagers.push({"id": args.message.mentions.roles.first().id, "guild": args.message.guild.id});
-        Config.set("managers", existingManagers);
-        args.message.reply("Added " + args.message.mentions.roles.first().name);
-    }
+    });
 }

@@ -1,5 +1,4 @@
 const Database = require('../helpers/database');
-const Config = require('../helpers/config');
 const Utils = require('../helpers/utils');
 
 module.exports = {
@@ -20,7 +19,28 @@ function execute(args) {
     }
     else {
         // Return guild by specific values
-        args.message.reply("This function is not supported yet, pepe busy eating.");
+        let searchFilter = {}
+        for (let index = 0; index < commandArgs.length; index++) {
+            const argument = commandArgs[index];
+            if(argument.includes("=")){
+                let keyWord = argument.substr(0, argument.indexOf('='));
+                let keyValue = argument.substr(argument.indexOf("=")+1);
+
+                switch(keyWord) {
+                    case "class":
+                        searchFilter["char_class"] = Utils.getValidClass(keyValue);
+                        break;
+                    case "level":
+                        searchFilter["char_level"] = parseInt(keyValue);
+                        break;
+                    case "axe": 
+                        searchFilter["new_axe_lvl"] = keyValue;
+                        break;
+                }
+            }
+        }
+
+        Database.getGuildWithFilter(args.message.guild.id, searchFilter, handlePlayerRecords, args.message);
         return;
     }
 }
@@ -57,7 +77,7 @@ function handlePlayerRecords(error, players, discordMessage) {
             discordMessage.channel.send({embed: {
                 color: 0x4d0272,
                 title: discordMessage.guild.name + " Stats",
-                thumbnail: {url: discordMessage.iconURL},
+                thumbnail: {url: discordMessage.guild.iconURL},
                 fields: [{
                     name: "Avg Attack Power",
                     value: Math.ceil(totalAp / players.length)

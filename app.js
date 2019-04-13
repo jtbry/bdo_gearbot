@@ -121,7 +121,7 @@ function processCommand(str, msg) {
                 if(mod.requiresAdmin &&  Utils.isManagerMessage(msg)) {
                     mod.execute({cmd: str, message: msg, discordClient: client});
                 } else if(!mod.requiresAdmin) {
-                    mod.execute({cmd: str, message: msg});
+                    mod.execute({cmd: str, message: msg, discordClient: client});
                 } else {
                     msg.reply("You're not authorized for that... stupid.");
                 }

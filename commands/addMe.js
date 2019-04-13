@@ -29,6 +29,12 @@ function execute(args) {
     let aap = parseInt(gearArgs[2]);
     let dp = parseInt(gearArgs[3]);
     let gs = Math.ceil(((ap + aap) / 2) + dp);
+
+    if(ap == NaN || aap == NaN || dp == NaN || gs == NaN) {
+        args.message.reply("These aren't real numbers! :(");
+        return;
+    }
+
     let char_class = Utils.getValidClass(gearArgs[5]);
     if(!char_class) {
         args.message.reply("Sorry but " + gearArgs[5] + " is not a valid clas... idiot.");

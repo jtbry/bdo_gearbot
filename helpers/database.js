@@ -113,6 +113,26 @@ function getGuildWithFilter(guildId, filter, callback, discordMessage){
   });
 }
 
+// Get all users matching a filter and sort them
+function getUsersWithSort(searchFilter, sortFilter, callback){
+  const gearDb = client.db("gear");
+  
+  gearDb.collection("users").find(searchFilter, (err, records) => {
+    if(err) {
+      callback(err, null);
+    } else {
+      records.sort(sortFilter).toArray((err, result) => {
+        if(err) {
+          callback(err, null)
+        }
+        else {
+          callback(null, result);
+        }
+      });
+    }
+  });
+}
+
 // Get the total number of documents in the `gear.users` collection
 function getTotalNumberOfUsers(callback) {
   const gearDb = client.db("gear");
@@ -215,6 +235,7 @@ module.exports.deleteUser = deleteUser;
 module.exports.updateUser = updateUser;
 module.exports.getWholeGuild = getWholeGuild;
 module.exports.customUpdateUser = customUpdateUser;
+module.exports.getUsersWithSort = getUsersWithSort;
 
 // Guild Function Exports
 module.exports.updateGuild = updateGuild;

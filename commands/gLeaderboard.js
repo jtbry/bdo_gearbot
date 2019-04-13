@@ -5,7 +5,7 @@ module.exports = {
     name: "gLeaderboard",
     description: "Get top 10 gear scores.",
     usage: "~gLeaderboard",
-    requiresAdmin: true,
+    requiresAdmin: false,
     isEssential: true,
     execute: execute
 }

@@ -64,6 +64,10 @@ function handlePlayerRecords(error, players, discordMessage) {
     let foundClasses = [];
 
     players.forEach((player, index) => {
+        if(player.gear_score == NaN || player.attack_power == NaN || player.defense_power == NaN || player.awaken_atk_power == NaN) {
+            console.log(`${player.discord_id} was excluded from gStat due to errors.`);
+            return;
+        }
         totalGs += player.gear_score;
         totalAp += player.attack_power;
         totalDp += player.defense_power;

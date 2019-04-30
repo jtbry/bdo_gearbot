@@ -28,6 +28,8 @@ client.on('ready', () => {
 
 });
 
+client.on('error', console.error);
+
 client.on('guildCreate', (guild) => {
     Database.addGuild(guild.id, guild.name, (err) => {
         if(err) {
@@ -96,7 +98,11 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 });
 
 Config.onConfigLoad(() => {
-    client.login((process.env.BOT_TOKEN != undefined ? process.env.BOT_TOKEN : Config.get("bot_token")));
+    client.login((process.env.BOT_TOKEN != undefined ? process.env.BOT_TOKEN : Config.get("bot_token")))
+        .catch((result) => {
+            console.log("Failed to login, exiting with code 1.");
+            process.exit(1);
+        });
 });
 
 

@@ -27,6 +27,11 @@ function handlePlayerRecords(error, players, discordMessage) {
     for (let index = 0; index < players.length; index++) {
         const currentPlayer = players[index];
         
+        if(currentPlayer.gear_score == NaN || currentPlayer.attack_power == NaN || currentPlayer.defense_power == NaN || currentPlayer.awaken_atk_power == NaN) {
+            console.log(`${player.discord_id} was excluded from gOutliers due to errors.`);
+            continue;
+        }
+
         totalAverages.ap += currentPlayer.attack_power;
         totalAverages.dp += currentPlayer.defense_power;
         totalAverages.aap += currentPlayer.awaken_atk_power;

@@ -27,16 +27,29 @@ function execute(args) {
         if(thisEvent.eventId == eventArgs[1]) {
             let membersSnowflake = args.message.guild.roles.get(thisEvent.eventTargetRole).members;
             let eventChannel = args.message.guild.channels.find(channel => channel.id == thisEvent.eventChannel);
-            eventChannel.fetchMessage(thisEvent.eventMessage)
-                .then(message => messageAllMembers(membersSnowflake, eventChannel, message, thisEvent));
-            
-            args.message.channel.send("Sending a reminder to users... 8)")
-                .then((responseMessage) => {
+            if(!thisEvent.eventMessage) {
+                args.message.delete();
+
+                args.message.channel.send("Please try again in a bit... 8)")
+                .then((sentMsg) => {
                     setTimeout(() => {
-                        responseMessage.delete();
+                        sentMsg.delete();
                     }, 5000);
                 });
-            args.message.delete();
+
+                return;
+            } else {
+                eventChannel.fetchMessage(thisEvent.eventMessage)
+                    .then(message => messageAllMembers(membersSnowflake, eventChannel, message, thisEvent));
+                
+                args.message.channel.send("Sending a reminder to users... 8)")
+                    .then((sentMsg) => {
+                        setTimeout(() => {
+                            sentMsg.delete();
+                        }, 5000);
+                    });
+                args.message.delete();
+            }
             
         }
         else if(i == guildEvents.length - 1) {

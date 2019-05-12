@@ -263,6 +263,9 @@ function updateGuildEventMessage(guildId, eventId, messageId, callback) {
       callback(error.message);
     } else {
       callback(null);
+      
+      // Call find guild to simply update the cache (this can be done better)
+      findGuild(guildId, () => {});
     }
   }) 
 }

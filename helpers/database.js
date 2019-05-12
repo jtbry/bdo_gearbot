@@ -216,7 +216,8 @@ function addGuild(guildId, guildName, callback) {
     gid: guildId,
     name: guildName,
     guildTeams: [],
-    guildManagers: []
+    guildManagers: [],
+    guildEvents: []
   }, (err, record) => {
     if(err) {
       callback(err);
@@ -226,6 +227,50 @@ function addGuild(guildId, guildName, callback) {
   });
 }
 
+// Add a guild event to a guild's database
+function addGuildEvent(guildId, eventId, date, title, eventChannel, roleTarget, callback) {
+  let eventJson = {eventId: eventId, eventDate: date, eventTitle: title, eventChannel: eventChannel, eventTargetRole: roleTarget, eventMessage: null};
+  let guildUpdateQuery = {$push: {guildEvents: eventJson}};
+
+  updateGuild(guildId, guildUpdateQuery, (error) => {
+    if(error) {
+      callback(error);
+    } else {
+      callback(null);
+    }
+  });
+}
+
+// Remove a guild event from a guild's database
+function removeGuildEvent(guildId, eventId, callback) {
+  let eventJson = {eventId: eventId};
+  let guildUpdateQuery = {$pull: {guildEvents: eventJson}};
+
+  updateGuild(guildId, guildUpdateQuery, (error) => {
+    if(error) {
+      callback(error);
+    } else {
+      callback(null);
+    }
+  });
+}
+
+// Update a guild event
+function updateGuildEventMessage(guildId, eventId, messageId, callback) {
+  const gearDb = client.db("gear");
+  gearDb.collection("guilds").updateOne({gid: guildId, 'guildEvents.eventId': eventId}, {$set: {'guildEvents.$.eventMessage': messageId}}, (error, record) => {
+    if(error) {
+      callback(error.message);
+    } else {
+      callback(null);
+    }
+  }) 
+}
+
+// Get a guild's events
+function getGuildEvents(guildId) {
+  
+} 
 
 // User Function Exports
 module.exports.getTotalNumberOfUsers = getTotalNumberOfUsers;
@@ -243,3 +288,9 @@ module.exports.deleteGuild = deleteGuild;
 module.exports.addGuild = addGuild;
 module.exports.findGuild = findGuild;
 module.exports.getGuildWithFilter = getGuildWithFilter;
+
+// Guild Event Exports
+module.exports.addGuildEvent = addGuildEvent;
+module.exports.removeGuildEvent = removeGuildEvent;
+module.exports.updateGuildEventMessage = updateGuildEventMessage;
+module.exports.getGuildEvents = getGuildEvents;

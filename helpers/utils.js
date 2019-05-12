@@ -1,6 +1,8 @@
 const Config = require('../helpers/config');
 const listOfBdoClasses = ["Warrior", "Ranger", "Sorceress", "Berserker", "Valkyrie", "Wizard", "Witch", "Tamer", "Maehwa", "Musa", "Ninja", "Kunoichi", "Dark Knight", "Striker", "Mystic", "Lahn", "Archer"];
 const validEnhancementValues = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "PRI", "DUO", "TRI", "TET", "PEN"];
+const daysOfTheWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 // Check if a given string is a valid BDO class
 function getValidClass(classString) {
@@ -40,7 +42,7 @@ function isManagerMessage(msg) {
         }
         for (let index = 0; index < possibleAdminRoles.length; index++) {
             const adminRole = possibleAdminRoles[index];
-            if(msg.member.roles.find(role => role.id = adminRole.id)) {
+            if(msg.member.roles.find(role => role.id == adminRole.id)) {
                 return true;
             }
 
@@ -64,8 +66,35 @@ function getValidEnhanceValue(val) {
     }
 }
 
+// Generate a random string of a given length
+function generateRandomString(length) {
+    return Math.random().toString(36).substring(2, length+2);
+}
+
+// Get a humanly readable date string from a unix timestamp
+function getHumanStringFromUnix(unixTimestamp) {
+    let date = new Date(unixTimestamp);
+    return `${daysOfTheWeek[date.getDay()]}, ${monthsOfTheYear[date.getMonth()]} ${date.getDate()}`;
+}
+
+// Combine elements of a given array
+function combineStringArray(array, indexStart, indexEnd) {
+    let combinedItem = "";
+    let startIndex = indexStart ? indexStart : 0;
+    let finishIndex = indexEnd ? indexEnd : array.length;
+
+    for(let i = startIndex; i < finishIndex; i++) {
+        combinedItem += (array[i] + " ");
+    }
+
+    return combinedItem
+}
+
 // Module Exports
 module.exports.getValidClass = getValidClass;
 module.exports.isEmptyString = isEmptyString;
 module.exports.isManagerMessage = isManagerMessage;
 module.exports.getValidEnhanceValue = getValidEnhanceValue;
+module.exports.generateRandomString = generateRandomString;
+module.exports.getHumanStringFromUnix = getHumanStringFromUnix;
+module.exports.combineStringArray = combineStringArray;

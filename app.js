@@ -4,11 +4,10 @@ const Database = require('./helpers/database');
 const Commands = require('./commands');
 const Config = require('./helpers/config');
 const Utils = require('./helpers/utils');
-const CURRENT_VERSION = "1.4";
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    client.user.setPresence({ game: { name: 'with Mushroom-chan | v'+CURRENT_VERSION }, status: 'dnd' });
+    client.user.setPresence({ game: { name: 'with Mushroom-chan'}, status: 'dnd' });
 
     client.guilds.array().forEach(userGuild => {
         Database.findGuild(userGuild.id, (err, foundGuild) => {

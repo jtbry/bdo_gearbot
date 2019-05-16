@@ -53,7 +53,7 @@ client.on('message', msg => {
 
 client.on("guildMemberRemove", (member) => {
     Database.findUser(member.id, (user) => {
-        if(user) {
+        if(user && (user.guild == member.guild.id)) {
             Database.deleteUser(member.id, (error) => {
                 if(error) {
                     console.log("I had an error removing " + member.id + " from the database");

@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "discord.js": "^11.4.2",
+    "json2csv": "^4.5.1",
     "mongodb": "^3.2.2"
   },
   "devDependencies": {},

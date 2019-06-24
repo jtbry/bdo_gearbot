@@ -123,12 +123,17 @@ function processCommand(str, msg) {
     } else {
         Commands.findCommand(str, (mod) => {
             if(mod != null) {
-                if(mod.requiresAdmin &&  Utils.isManagerMessage(msg)) {
-                    mod.execute({cmd: str, message: msg, discordClient: client});
-                } else if(!mod.requiresAdmin) {
-                    mod.execute({cmd: str, message: msg, discordClient: client});
-                } else {
-                    msg.reply("You're not authorized for that... stupid.");
+                try {
+                    if(mod.requiresAdmin &&  Utils.isManagerMessage(msg)) {
+                        mod.execute({cmd: str, message: msg, discordClient: client});
+                    } else if(!mod.requiresAdmin) {
+                        mod.execute({cmd: str, message: msg, discordClient: client});
+                    } else {
+                        msg.reply("You're not authorized for that... stupid.");
+                    }
+                } catch(commandError) {
+                    msg.reply("uwu... sorry user-chan!! I had a fatal error, ask Mushrom-kun.");
+                    console.log(commandError);
                 }
             } else {
                 msg.reply("Sorry, I couldn't find that command. Please read the ~help 8)");

@@ -1,5 +1,6 @@
 # bdo_gearbot
 A gear and node war bot for BDO
+**Archived:** This repo has been archived. I haven't touched it for years. The code out of date and messy and even buggy but I keep it up because some people seem to still view/star it on occasion.
 
 # Open sourced gear bot for BDO Guilds
 This is a gear bot for Black Desert Online Guilds it works via Discord, it requires MongoDB and NodeJS. When deployed on services using ephemeral file systems the `config.js` may have issues with file based configs.
